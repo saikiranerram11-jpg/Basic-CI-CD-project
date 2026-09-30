@@ -32,17 +32,41 @@ pipeline {
             }
         }
 
+        stage('Deploy') {
+            steps {
+
+                echo 'Stopping old container...'
+
+                sh '''
+                    docker stop basic-cicd-container || true
+                '''
+
+                echo 'Removing old container...'
+
+                sh '''
+                    docker rm basic-cicd-container || true
+                '''
+
+                echo 'Starting new container...'
+
+                sh '''
+                    docker run -d \
+                    --name basic-cicd-container \
+                    -p 8081:8081 \
+                    basic-cicd-app:latest
+                '''
+            }
+        }
     }
 
     post {
 
         success {
-            echo 'CI Pipeline completed successfully!'
+            echo 'CI/CD Pipeline completed successfully!'
         }
 
         failure {
-            echo 'CI Pipeline failed.'
+            echo 'CI/CD Pipeline failed.'
         }
-
     }
 }
